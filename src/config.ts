@@ -20,6 +20,12 @@ export const SCHEDULER_POLL_INTERVAL = 60000;
 const PROJECT_ROOT = process.cwd();
 const HOME_DIR = process.env.HOME || os.homedir();
 
+// Railway deployment detection
+export const IS_RAILWAY = !!process.env.RAILWAY_ENVIRONMENT;
+export const RAILWAY_VOLUME = process.env.RAILWAY_VOLUME_MOUNT_PATH || '/data';
+export const MAIN_GROUP_FOLDER = 'main';
+export const SLACK_BOT_TOKEN = process.env.SLACK_BOT_TOKEN || '';
+
 // Mount security: allowlist stored OUTSIDE project root, never mounted into containers
 export const MOUNT_ALLOWLIST_PATH = path.join(
   HOME_DIR,
@@ -27,9 +33,15 @@ export const MOUNT_ALLOWLIST_PATH = path.join(
   'nanoclaw',
   'mount-allowlist.json',
 );
-export const STORE_DIR = path.resolve(PROJECT_ROOT, 'store');
-export const GROUPS_DIR = path.resolve(PROJECT_ROOT, 'groups');
-export const DATA_DIR = path.resolve(PROJECT_ROOT, 'data');
+export const STORE_DIR = IS_RAILWAY
+  ? path.join(RAILWAY_VOLUME, 'store')
+  : path.resolve(PROJECT_ROOT, 'store');
+export const GROUPS_DIR = IS_RAILWAY
+  ? path.join(RAILWAY_VOLUME, 'groups')
+  : path.resolve(PROJECT_ROOT, 'groups');
+export const DATA_DIR = IS_RAILWAY
+  ? path.join(RAILWAY_VOLUME, 'data')
+  : path.resolve(PROJECT_ROOT, 'data');
 
 export const CONTAINER_IMAGE =
   process.env.CONTAINER_IMAGE || 'nanoclaw-agent:latest';
