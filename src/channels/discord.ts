@@ -1,4 +1,11 @@
-import { Client, Events, GatewayIntentBits, Message, TextChannel } from 'discord.js';
+import {
+  ChannelType,
+  Client,
+  Events,
+  GatewayIntentBits,
+  Message,
+  TextChannel,
+} from 'discord.js';
 
 import { ASSISTANT_NAME, TRIGGER_PATTERN } from '../config.js';
 import { readEnvFile } from '../env.js';
@@ -88,18 +95,20 @@ export class DiscordChannel implements Channel {
 
       // Handle attachments — store placeholders so the agent knows something was sent
       if (message.attachments.size > 0) {
-        const attachmentDescriptions = [...message.attachments.values()].map((att) => {
-          const contentType = att.contentType || '';
-          if (contentType.startsWith('image/')) {
-            return `[Image: ${att.name || 'image'}]`;
-          } else if (contentType.startsWith('video/')) {
-            return `[Video: ${att.name || 'video'}]`;
-          } else if (contentType.startsWith('audio/')) {
-            return `[Audio: ${att.name || 'audio'}]`;
-          } else {
-            return `[File: ${att.name || 'file'}]`;
-          }
-        });
+        const attachmentDescriptions = [...message.attachments.values()].map(
+          (att) => {
+            const contentType = att.contentType || '';
+            if (contentType.startsWith('image/')) {
+              return `[Image: ${att.name || 'image'}]`;
+            } else if (contentType.startsWith('video/')) {
+              return `[Video: ${att.name || 'video'}]`;
+            } else if (contentType.startsWith('audio/')) {
+              return `[Audio: ${att.name || 'audio'}]`;
+            } else {
+              return `[File: ${att.name || 'file'}]`;
+            }
+          },
+        );
         if (content) {
           content = `${content}\n${attachmentDescriptions.join('\n')}`;
         } else {
@@ -125,7 +134,13 @@ export class DiscordChannel implements Channel {
 
       // Store chat metadata for discovery
       const isGroup = message.guild !== null;
-      this.opts.onChatMetadata(chatJid, timestamp, chatName, 'discord', isGroup);
+      this.opts.onChatMetadata(
+        chatJid,
+        timestamp,
+        chatName,
+        'discord',
+        isGroup,
+      );
 
       // Only deliver full message for registered groups
       const group = this.opts.registeredGroups()[chatJid];
@@ -159,7 +174,7 @@ export class DiscordChannel implements Channel {
       logger.error({ err: err.message }, 'Discord client error');
     });
 
-    return new Promise<void>((resolve) => {
+    await new Promise<void>((resolve) => {
       this.client!.once(Events.ClientReady, (readyClient) => {
         logger.info(
           { username: readyClient.user.tag, id: readyClient.user.id },
@@ -174,6 +189,9 @@ export class DiscordChannel implements Channel {
 
       this.client!.login(this.botToken);
     });
+
+    // Sync channel metadata after login
+    await this.syncGroups();
   }
 
   async sendMessage(jid: string, text: string): Promise<void> {
@@ -221,6 +239,31 @@ export class DiscordChannel implements Channel {
       this.client.destroy();
       this.client = null;
       logger.info('Discord bot stopped');
+    }
+  }
+
+  /**
+   * Sync all text channels the bot has access to.
+   * Reports metadata so they appear in available_groups for auto-registration.
+   */
+  async syncGroups(_force?: boolean): Promise<void> {
+    if (!this.client || !this.client.isReady()) return;
+    try {
+      const now = new Date().toISOString();
+      let count = 0;
+      for (const guild of this.client.guilds.cache.values()) {
+        const channels = await guild.channels.fetch();
+        for (const ch of channels.values()) {
+          if (!ch || ch.type !== ChannelType.GuildText) continue;
+          const jid = `dc:${ch.id}`;
+          const name = `${guild.name} / ${ch.name}`;
+          this.opts.onChatMetadata(jid, now, name, 'discord', true);
+          count++;
+        }
+      }
+      logger.info({ count }, 'Discord channel metadata synced');
+    } catch (err) {
+      logger.error({ err }, 'Failed to sync Discord channel metadata');
     }
   }
 

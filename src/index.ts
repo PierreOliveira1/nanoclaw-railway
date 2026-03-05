@@ -564,6 +564,42 @@ async function main(): Promise<void> {
         { jid: mainJid, name: mainName },
         'Auto-registered main group',
       );
+
+    }
+  }
+
+  // Auto-register any group channels the bot is a member of that aren't
+  // already registered. Runs on every startup so newly-added channels
+  // (Slack, Telegram, Discord, WhatsApp) are picked up automatically.
+  {
+    await Promise.all(
+      channels.filter((ch) => ch.syncGroups).map((ch) => ch.syncGroups!(false)),
+    );
+    const allChats = getAllChats();
+    for (const chat of allChats) {
+      if (!registeredGroups[chat.jid] && chat.is_group && chat.name) {
+        // Derive channel prefix for folder name (slack, tg, dc, wa)
+        let prefix: string;
+        if (chat.jid.startsWith('slack:')) prefix = 'slack';
+        else if (chat.jid.startsWith('tg:')) prefix = 'tg';
+        else if (chat.jid.startsWith('dc:')) prefix = 'dc';
+        else if (chat.jid.includes('@g.us')) prefix = 'wa';
+        else continue; // skip non-group JIDs (gmail, solo chats, etc.)
+
+        const safeName = chat.name.replace(/[^a-zA-Z0-9-]/g, '-').toLowerCase().slice(0, 50);
+        const folderName = `${prefix}_${safeName}`;
+        registerGroup(chat.jid, {
+          name: chat.name,
+          folder: folderName,
+          trigger: `@${ASSISTANT_NAME}`,
+          added_at: new Date().toISOString(),
+          requiresTrigger: true,
+        });
+        logger.info(
+          { jid: chat.jid, name: chat.name, folder: folderName },
+          'Auto-registered channel group',
+        );
+      }
     }
   }
 

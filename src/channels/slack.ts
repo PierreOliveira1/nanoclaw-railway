@@ -152,7 +152,7 @@ export class SlackChannel implements Channel {
     await this.flushOutgoingQueue();
 
     // Sync channel names on startup
-    await this.syncChannelMetadata();
+    await this.syncGroups();
   }
 
   async sendMessage(jid: string, text: string): Promise<void> {
@@ -212,12 +212,14 @@ export class SlackChannel implements Channel {
   /**
    * Sync channel metadata from Slack.
    * Fetches channels the bot is a member of and stores their names in the DB.
+   * Also reports metadata so channels appear in available_groups.
    */
-  async syncChannelMetadata(): Promise<void> {
+  async syncGroups(_force?: boolean): Promise<void> {
     try {
       logger.info('Syncing channel metadata from Slack...');
       let cursor: string | undefined;
       let count = 0;
+      const now = new Date().toISOString();
 
       do {
         const result = await this.app.client.conversations.list({
@@ -229,7 +231,10 @@ export class SlackChannel implements Channel {
 
         for (const ch of result.channels || []) {
           if (ch.id && ch.name && ch.is_member) {
-            updateChatName(`slack:${ch.id}`, ch.name);
+            const jid = `slack:${ch.id}`;
+            updateChatName(jid, ch.name);
+            // Report metadata so these channels appear in available_groups
+            this.opts.onChatMetadata(jid, now, ch.name, 'slack', true);
             count++;
           }
         }
