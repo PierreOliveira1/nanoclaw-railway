@@ -177,8 +177,11 @@ async function processGroupMessages(chatJid: string): Promise<boolean> {
   let prompt: string;
   if (latestMsg.thread_id) {
     const threadMsgs = getThreadMessages(chatJid, latestMsg.thread_id);
-    const recent = getMessagesSince(chatJid, sinceTimestamp, ASSISTANT_NAME)
-      .slice(-5);
+    const recent = getMessagesSince(
+      chatJid,
+      sinceTimestamp,
+      ASSISTANT_NAME,
+    ).slice(-5);
     prompt = formatThreadWithContext(threadMsgs, recent);
   } else {
     prompt = formatMessages(missedMessages);
@@ -428,8 +431,7 @@ async function startMessageLoop(): Promise<void> {
               lastAgentTimestamp[chatJid] || '',
               ASSISTANT_NAME,
             );
-            messagesToSend =
-              allPending.length > 0 ? allPending : groupMessages;
+            messagesToSend = allPending.length > 0 ? allPending : groupMessages;
             formatted = formatMessages(messagesToSend);
           }
 
@@ -494,7 +496,9 @@ async function main(): Promise<void> {
     );
     if (fs.existsSync(staleEnvPath)) {
       fs.unlinkSync(staleEnvPath);
-      logger.info('Removed stale /data/.env — secrets now come from Railway service config');
+      logger.info(
+        'Removed stale /data/.env — secrets now come from Railway service config',
+      );
     }
   }
 

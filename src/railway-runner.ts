@@ -183,7 +183,9 @@ export async function runRailwayAgent(
 
     // Pass secrets via stdin (never exposed as env vars)
     input.secrets = readSecrets();
-    (input as unknown as Record<string, unknown>).secretKeyNames = Object.keys(input.secrets);
+    (input as unknown as Record<string, unknown>).secretKeyNames = Object.keys(
+      input.secrets,
+    );
     child.stdin.write(JSON.stringify(input));
     child.stdin.end();
     delete input.secrets;

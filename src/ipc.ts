@@ -468,9 +468,15 @@ export async function processTaskIpc(
             `${data.requestId}.json`,
           );
           fs.writeFileSync(responseFile, JSON.stringify(result, null, 2));
-          logger.info({ name: data.name, removed: result.removed }, 'Skill removed via IPC');
+          logger.info(
+            { name: data.name, removed: result.removed },
+            'Skill removed via IPC',
+          );
         } catch (err) {
-          logger.error({ name: data.name, err }, 'Failed to remove skill via IPC');
+          logger.error(
+            { name: data.name, err },
+            'Failed to remove skill via IPC',
+          );
           const groupIpcDir = resolveGroupIpcPath(sourceGroup);
           const responseFile = path.join(
             groupIpcDir,
@@ -479,11 +485,17 @@ export async function processTaskIpc(
           );
           fs.writeFileSync(
             responseFile,
-            JSON.stringify({ removed: false, error: err instanceof Error ? err.message : String(err) }),
+            JSON.stringify({
+              removed: false,
+              error: err instanceof Error ? err.message : String(err),
+            }),
           );
         }
       } else if (!isMain) {
-        logger.warn({ sourceGroup }, 'Unauthorized remove_skill attempt blocked');
+        logger.warn(
+          { sourceGroup },
+          'Unauthorized remove_skill attempt blocked',
+        );
       }
       break;
 
@@ -498,7 +510,10 @@ export async function processTaskIpc(
             `${data.requestId}.json`,
           );
           fs.writeFileSync(responseFile, JSON.stringify(result, null, 2));
-          logger.info({ skillCount: result.skills.length }, 'Skills listed via IPC');
+          logger.info(
+            { skillCount: result.skills.length },
+            'Skills listed via IPC',
+          );
         } catch (err) {
           logger.error({ err }, 'Failed to list skills via IPC');
           const groupIpcDir = resolveGroupIpcPath(sourceGroup);
@@ -509,11 +524,17 @@ export async function processTaskIpc(
           );
           fs.writeFileSync(
             responseFile,
-            JSON.stringify({ skills: [], error: err instanceof Error ? err.message : String(err) }),
+            JSON.stringify({
+              skills: [],
+              error: err instanceof Error ? err.message : String(err),
+            }),
           );
         }
       } else if (!isMain) {
-        logger.warn({ sourceGroup }, 'Unauthorized list_skills attempt blocked');
+        logger.warn(
+          { sourceGroup },
+          'Unauthorized list_skills attempt blocked',
+        );
       }
       break;
 
@@ -537,9 +558,15 @@ export async function processTaskIpc(
             `${data.requestId}.json`,
           );
           fs.writeFileSync(responseFile, JSON.stringify(result, null, 2));
-          logger.info({ name: data.name, envVarsNeeded: result.envVarsNeeded }, 'MCP server added via IPC');
+          logger.info(
+            { name: data.name, envVarsNeeded: result.envVarsNeeded },
+            'MCP server added via IPC',
+          );
         } catch (err) {
-          logger.error({ name: data.name, err }, 'Failed to add MCP server via IPC');
+          logger.error(
+            { name: data.name, err },
+            'Failed to add MCP server via IPC',
+          );
           const groupIpcDir = resolveGroupIpcPath(sourceGroup);
           const responseFile = path.join(
             groupIpcDir,
@@ -548,17 +575,26 @@ export async function processTaskIpc(
           );
           fs.writeFileSync(
             responseFile,
-            JSON.stringify({ added: false, error: err instanceof Error ? err.message : String(err) }),
+            JSON.stringify({
+              added: false,
+              error: err instanceof Error ? err.message : String(err),
+            }),
           );
         }
       } else if (!isMain) {
-        logger.warn({ sourceGroup }, 'Unauthorized add_mcp_server attempt blocked');
+        logger.warn(
+          { sourceGroup },
+          'Unauthorized add_mcp_server attempt blocked',
+        );
       }
       break;
 
     case 'remove_mcp_server':
       if (isMain && data.name && data.requestId) {
-        logger.info({ name: data.name, sourceGroup }, 'Removing MCP server via IPC');
+        logger.info(
+          { name: data.name, sourceGroup },
+          'Removing MCP server via IPC',
+        );
         try {
           const result = removeMcpServer(data.name);
           rebuildMcpJson();
@@ -569,9 +605,15 @@ export async function processTaskIpc(
             `${data.requestId}.json`,
           );
           fs.writeFileSync(responseFile, JSON.stringify(result, null, 2));
-          logger.info({ name: data.name, removed: result.removed }, 'MCP server removed via IPC');
+          logger.info(
+            { name: data.name, removed: result.removed },
+            'MCP server removed via IPC',
+          );
         } catch (err) {
-          logger.error({ name: data.name, err }, 'Failed to remove MCP server via IPC');
+          logger.error(
+            { name: data.name, err },
+            'Failed to remove MCP server via IPC',
+          );
           const groupIpcDir = resolveGroupIpcPath(sourceGroup);
           const responseFile = path.join(
             groupIpcDir,
@@ -580,11 +622,17 @@ export async function processTaskIpc(
           );
           fs.writeFileSync(
             responseFile,
-            JSON.stringify({ removed: false, error: err instanceof Error ? err.message : String(err) }),
+            JSON.stringify({
+              removed: false,
+              error: err instanceof Error ? err.message : String(err),
+            }),
           );
         }
       } else if (!isMain) {
-        logger.warn({ sourceGroup }, 'Unauthorized remove_mcp_server attempt blocked');
+        logger.warn(
+          { sourceGroup },
+          'Unauthorized remove_mcp_server attempt blocked',
+        );
       }
       break;
 
@@ -599,7 +647,10 @@ export async function processTaskIpc(
             `${data.requestId}.json`,
           );
           fs.writeFileSync(responseFile, JSON.stringify(result, null, 2));
-          logger.info({ serverCount: result.servers.length }, 'MCP servers listed via IPC');
+          logger.info(
+            { serverCount: result.servers.length },
+            'MCP servers listed via IPC',
+          );
         } catch (err) {
           logger.error({ err }, 'Failed to list MCP servers via IPC');
           const groupIpcDir = resolveGroupIpcPath(sourceGroup);
@@ -610,11 +661,17 @@ export async function processTaskIpc(
           );
           fs.writeFileSync(
             responseFile,
-            JSON.stringify({ servers: [], error: err instanceof Error ? err.message : String(err) }),
+            JSON.stringify({
+              servers: [],
+              error: err instanceof Error ? err.message : String(err),
+            }),
           );
         }
       } else if (!isMain) {
-        logger.warn({ sourceGroup }, 'Unauthorized list_mcp_servers attempt blocked');
+        logger.warn(
+          { sourceGroup },
+          'Unauthorized list_mcp_servers attempt blocked',
+        );
       }
       break;
 

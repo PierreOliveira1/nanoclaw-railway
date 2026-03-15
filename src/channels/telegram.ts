@@ -104,10 +104,7 @@ export class TelegramChannel implements Channel {
         : String(ctx.message.message_id);
 
       // Track so sendMessage can reply to this message
-      this.activeThread.set(
-        String(ctx.chat.id),
-        ctx.message.message_id,
-      );
+      this.activeThread.set(String(ctx.chat.id), ctx.message.message_id);
 
       // Store chat metadata for discovery
       const isGroup =
@@ -251,7 +248,10 @@ export class TelegramChannel implements Channel {
           );
         }
       }
-      logger.info({ jid, length: text.length, replyTo }, 'Telegram message sent');
+      logger.info(
+        { jid, length: text.length, replyTo },
+        'Telegram message sent',
+      );
     } catch (err) {
       logger.error({ jid, err }, 'Failed to send Telegram message');
     }

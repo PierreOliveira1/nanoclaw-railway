@@ -87,7 +87,12 @@ export function removeMcpServer(name: string): { removed: boolean } {
  * List all registered MCP servers from the lock file.
  */
 export function listMcpServers(): {
-  servers: Array<{ name: string; command: string; args: string[]; env?: Record<string, string> }>;
+  servers: Array<{
+    name: string;
+    command: string;
+    args: string[];
+    env?: Record<string, string>;
+  }>;
 } {
   const lock = readLockFile();
   return {
@@ -119,7 +124,10 @@ export function rebuildMcpJson(): void {
     try {
       baseConfig = JSON.parse(fs.readFileSync(mcpJsonPath, 'utf-8'));
       fs.mkdirSync(path.dirname(baseConfigPath), { recursive: true });
-      fs.writeFileSync(baseConfigPath, JSON.stringify(baseConfig, null, 2) + '\n');
+      fs.writeFileSync(
+        baseConfigPath,
+        JSON.stringify(baseConfig, null, 2) + '\n',
+      );
     } catch {
       // Ignore
     }

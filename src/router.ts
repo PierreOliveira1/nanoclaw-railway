@@ -27,9 +27,7 @@ export function formatThreadWithContext(
 ): string {
   // Filter out messages already in the thread to avoid duplicates
   const threadIds = new Set(threadMessages.map((m) => m.id));
-  const contextOnly = recentChannelMessages.filter(
-    (m) => !threadIds.has(m.id),
-  );
+  const contextOnly = recentChannelMessages.filter((m) => !threadIds.has(m.id));
 
   let result = '';
   if (contextOnly.length > 0) {

@@ -279,7 +279,12 @@ const BLOCKED_ENV_PREFIXES = [
 function collectCustomEnvVars(): string[] {
   const keys: string[] = [];
   for (const key of Object.keys(process.env)) {
-    if (BLOCKED_ENV_PREFIXES.some((prefix) => key.startsWith(prefix) || key === prefix)) continue;
+    if (
+      BLOCKED_ENV_PREFIXES.some(
+        (prefix) => key.startsWith(prefix) || key === prefix,
+      )
+    )
+      continue;
     // Skip empty values
     if (!process.env[key]) continue;
     keys.push(key);
@@ -309,7 +314,15 @@ export function readSecrets(): Record<string, string> {
   const skillEnvKeys = collectSkillEnvVars();
   const persistentMcpEnvKeys = collectPersistentMcpEnvVars();
   const customEnvKeys = IS_RAILWAY ? collectCustomEnvVars() : [];
-  const allKeys = [...new Set([...coreKeys, ...mcpEnvKeys, ...skillEnvKeys, ...persistentMcpEnvKeys, ...customEnvKeys])];
+  const allKeys = [
+    ...new Set([
+      ...coreKeys,
+      ...mcpEnvKeys,
+      ...skillEnvKeys,
+      ...persistentMcpEnvKeys,
+      ...customEnvKeys,
+    ]),
+  ];
 
   const fromFile = readEnvFile(allKeys);
   // Fallback to process.env for Railway (secrets set as env vars, no .env file)
@@ -411,7 +424,9 @@ export async function runContainerAgent(
 
     // Pass secrets via stdin (never written to disk or mounted as files)
     input.secrets = readSecrets();
-    (input as unknown as Record<string, unknown>).secretKeyNames = Object.keys(input.secrets);
+    (input as unknown as Record<string, unknown>).secretKeyNames = Object.keys(
+      input.secrets,
+    );
     container.stdin.write(JSON.stringify(input));
     container.stdin.end();
     // Remove secrets from input so they don't appear in logs
