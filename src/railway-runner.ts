@@ -174,6 +174,14 @@ export async function runRailwayAgent(
         RAILWAY_ENVIRONMENT: process.env.RAILWAY_ENVIRONMENT || '',
         ANTHROPIC_BASE_URL: 'http://127.0.0.1:' + CREDENTIAL_PROXY_PORT,
         ANTHROPIC_API_KEY: 'proxy-injected',
+        ANTHROPIC_MODEL: process.env.ANTHROPIC_MODEL || 'kimi-k2.6:cloud',
+        ANTHROPIC_DEFAULT_SONNET_MODEL:
+          process.env.ANTHROPIC_DEFAULT_SONNET_MODEL ||
+          process.env.ANTHROPIC_MODEL ||
+          'kimi-k2.6:cloud',
+        ANTHROPIC_DEFAULT_HAIKU_MODEL:
+          process.env.ANTHROPIC_DEFAULT_HAIKU_MODEL ||
+          'qwen3.5:cloud',
       },
     });
 

@@ -702,6 +702,9 @@ async function main(): Promise<void> {
     ANTHROPIC_BASE_URL: process.env.ANTHROPIC_BASE_URL,
     ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY,
     CLAUDE_CODE_OAUTH_TOKEN: process.env.CLAUDE_CODE_OAUTH_TOKEN,
+    ANTHROPIC_MODEL: process.env.ANTHROPIC_MODEL,
+    ANTHROPIC_DEFAULT_SONNET_MODEL: process.env.ANTHROPIC_DEFAULT_SONNET_MODEL,
+    ANTHROPIC_DEFAULT_HAIKU_MODEL: process.env.ANTHROPIC_DEFAULT_HAIKU_MODEL,
     CLAUDE_CODE_AUTO_COMPACT_WINDOW: '165000',
   };
   // Add explicitly forwarded secrets (MCP env vars, channel tokens, etc.)
